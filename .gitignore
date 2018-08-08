@@ -1,0 +1,16 @@
+# API keys and secrets
+.env
+
+# Node
+node_modules
+build
+
+# We use lerna so yarn is off the table
+yarn.lock
+
+# We pin versions, so no use of package-lock.json
+package-lock.json
+
+# OS metadata
+.DS_Store
+Thumbs.db
