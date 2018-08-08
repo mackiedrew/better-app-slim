@@ -1,0 +1,174 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "node": true
+  },
+  "plugins": [
+    "prettier",
+    "fp",
+    "jsdoc",
+    "import",
+    "eslint-comments",
+    "flowtype",
+    "promise"
+  ],
+  "extends": [
+    "prettier",
+    "plugin:you-dont-need-lodash-underscore/compatible",
+    "plugin:eslint-comments/recommended",
+    "plugin:flowtype/recommended"
+  ],
+  "globals": {
+    "Promise": true
+  },
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "printWidth": 100,
+        "semi": false,
+        "trailingComma": "all"
+      }
+    ],
+    "max-lines": [
+      "error",
+      {
+        "max": 250,
+        "skipBlankLines": true,
+        "skipComments": true
+      }
+    ],
+    "max-statements": [
+      "warn",
+      {
+        "max": 25
+      }
+    ],
+    "max-params": [
+      "error",
+      {
+        "max": 3
+      }
+    ],
+    "max-nested-callbacks": [
+      "error",
+      {
+        "max": 4
+      }
+    ],
+    "max-depth": [
+      "warn",
+      {
+        "max": 4
+      }
+    ],
+    "complexity": [
+      "error",
+      {
+        "max": 5
+      }
+    ],
+    "no-undef": "error",
+    "no-unreachable": "error",
+    "no-unused-vars": "error",
+    "no-extra-semi": "error",
+    "no-func-assign": "error",
+    "no-dupe-keys": "error",
+    "no-invalid-regexp": "error",
+    "valid-typeof": "error",
+    "dot-notation": "error",
+    "valid-jsdoc": "error",
+    "no-floating-decimal": "error",
+    "no-implicit-coercion": "error",
+    "no-implied-eval": "error",
+    "no-iterator": "error",
+    "prefer-spread": "error",
+    "use-isnan": "error",
+    "no-use-before-define": "error",
+    "no-shadow-restricted-names": "error",
+    "no-shadow": "error",
+    "no-restricted-globals": "error",
+    "no-delete-var": "error",
+    "no-useless-return": "error",
+    "no-useless-concat": "error",
+    "no-unused-expressions": "error",
+    "no-self-assign": "error",
+    "for-direction": "error",
+    "no-compare-neg-zero": "error",
+    "no-cond-assign": "error",
+    "no-dupe-args": "error",
+    "no-duplicate-case": "error",
+    "no-empty": "error",
+    "no-redeclare": "error",
+    "no-var": "error",
+    "prefer-const": "error",
+    "prefer-arrow-callback": "error",
+    "prefer-rest-params": "error",
+    "prefer-template": "error",
+    "no-useless-constructor": "error",
+    "no-this-before-super": "error",
+    "no-dupe-class-members": "error",
+    "constructor-super": "error",
+    "spaced-comment": "error",
+    "eol-last": [
+      "error",
+      "always"
+    ],
+    "id-length": [
+      "error",
+      {
+        "max": 30
+      }
+    ],
+    "fp/no-get-set": "error",
+    "fp/no-valueof-field": "error",
+    "fp/no-proxy": "error",
+    "fp/no-delete": "error",
+    "fp/no-events": "error",
+    "fp/no-arguments": "error",
+    "fp/no-throw": "error",
+    "fp/no-mutating-assign": "error",
+    "fp/no-loops": "error",
+    "jsdoc/check-param-names": "error",
+    "jsdoc/check-tag-names": "error",
+    "jsdoc/check-types": "error",
+    "jsdoc/newline-after-description": "error",
+    "jsdoc/require-description-complete-sentence": "error",
+    "jsdoc/require-example": "off",
+    "jsdoc/require-hyphen-before-param-description": "off",
+    "jsdoc/require-param": "error",
+    "jsdoc/require-param-description": "error",
+    "jsdoc/require-param-type": "error",
+    "jsdoc/require-returns-description": "error",
+    "jsdoc/require-returns-type": "error",
+    "import/no-unresolved": [
+      "error",
+      {
+        "commonjs": true
+      }
+    ],
+    "import/named": "error",
+    "import/default": "error",
+    "import/no-absolute-path": "error",
+    "import/no-self-import": "error",
+    "import/no-cycle": "error",
+    "import/export": "error",
+    "import/no-deprecated": "error",
+    "import/no-extraneous-dependencies": "error",
+    "import/no-mutable-exports": "error",
+    "import/extensions": "error",
+    "import/first": "error",
+    "import/no-duplicates": "error",
+    "import/order": [
+      "error",
+      {
+        "newlines-between": "always-and-inside-groups"
+      }
+    ],
+    "import/prefer-default-export": "error",
+    "import/newline-after-import": "error",
+    "import/no-named-default": "error",
+    "promise/always-return": "error",
+    "promise/catch-or-return": "error"
+  }
+}

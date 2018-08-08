@@ -1,9 +1,14 @@
 {
     "cSpell.words": [
         "Mackie",
+        "cond",
+        "flowtype",
         "gmail",
+        "isnan",
         "mackiedrew",
-        "polyfill"
+        "polyfill",
+        "typeof",
+        "valueof"
     ],
     "javascript.validate.enable": true,
     "editor.tabSize": 2
