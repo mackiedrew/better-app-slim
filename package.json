@@ -5,5 +5,15 @@
   "main": "build/index.js",
   "author": "Mackie Drew <mackiedrew@gmail.com>",
   "license": "MIT",
-  "private": false
+  "private": false,
+  "scripts": {
+    "build": "babel source/ -d build/",
+    "prepublish": "yarn run build",
+    "test": "yarn run flow"
+  },
+  "devDependencies": {
+    "babel-cli": "6.26.0",
+    "babel-preset-flow": "6.23.0",
+    "flow-bin": "0.78.0"
+  }
 }
