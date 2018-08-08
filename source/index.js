@@ -1,3 +1,4 @@
 /* @flow */
-
-console.log("Hello World!")
+import "./cron"
+import "./firestore"
+import "./fitbit"
