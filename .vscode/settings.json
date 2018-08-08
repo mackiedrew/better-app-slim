@@ -1,6 +1,8 @@
 {
     "cSpell.words": [
         "Mackie",
+        "gmail",
         "mackiedrew"
-    ]
+    ],
+    "javascript.validate.enable": true
 }
