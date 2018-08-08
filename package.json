@@ -1,0 +1,9 @@
+{
+  "name": "better-app-slim",
+  "version": "1.0.0",
+  "description": "A slimmer version of the Better App meant to be more bottom-up rather than previous top-down.",
+  "main": "build/index.js",
+  "author": "Mackie Drew <mackiedrew@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
