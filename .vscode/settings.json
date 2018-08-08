@@ -4,5 +4,6 @@
         "gmail",
         "mackiedrew"
     ],
-    "javascript.validate.enable": true
+    "javascript.validate.enable": true,
+    "editor.tabSize": 2
 }
