@@ -7,14 +7,16 @@
   "license": "MIT",
   "private": false,
   "scripts": {
+    "start": "yarn run build && node build/index.js",
     "build": "babel source/ -d build/",
     "prepublish": "yarn run build",
-    "test": "yarn run flow",
+    "test": "yarn run flow && yarn run lint",
     "lint": "eslint ."
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
     "babel-eslint": "8.2.6",
+    "babel-plugin-transform-class-properties": "6.24.1",
     "babel-polyfill": "6.26.0",
     "babel-preset-env": "1.7.0",
     "babel-preset-flow": "6.23.0",
@@ -30,5 +32,12 @@
     "eslint-plugin-you-dont-need-lodash-underscore": "6.4.0",
     "flow-bin": "0.78.0",
     "prettier": "1.14.0"
+  },
+  "dependencies": {
+    "express": "4.16.3",
+    "firebase-admin": "5.13.1"
+  },
+  "engines": {
+    "node": "9.11.2"
   }
 }
