@@ -5,9 +5,7 @@ serviceAccountKey.json
 # Node
 node_modules
 build
-
-# We pin versions, so no use of package-lock.json
-package-lock.json
+yarn.lock
 
 # OS metadata
 .DS_Store

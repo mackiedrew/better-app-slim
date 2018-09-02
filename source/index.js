@@ -5,6 +5,8 @@ import "./cron"
 import "./firestore"
 import "./fitbit"
 
+require("@google-cloud/debug-agent").start()
+
 const PORT = 8080
 
 const App = express()

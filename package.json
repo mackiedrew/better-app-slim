@@ -7,11 +7,16 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "start": "yarn run build && node build/index.js",
+    "start": "node build/index.js",
+    "prestart": "npm run build",
     "build": "babel source/ -d build/",
-    "prepublish": "yarn run build",
-    "test": "yarn run flow && yarn run lint",
-    "lint": "eslint ."
+    "prepare": "npm run build",
+    "test": "npm run flow && npm run lint",
+    "lint": "eslint .",
+    "deploy": "gcloud app deploy --quiet",
+    "predeploy": "npm run build",
+    "logs": "gcloud app logs tail -s default",
+    "live": "gcloud app browse"
   },
   "devDependencies": {
     "babel-eslint": "8.2.6",
@@ -29,12 +34,15 @@
     "prettier": "1.14.0"
   },
   "dependencies": {
+    "@google-cloud/debug-agent": "^2.6.0",
     "babel-cli": "6.26.0",
     "babel-polyfill": "6.26.0",
     "babel-preset-env": "1.7.0",
     "babel-preset-flow": "6.23.0",
-    "babel-plugin-transform-class-properties": "6.24.1",
     "express": "4.16.3",
     "firebase-admin": "5.13.1"
+  },
+  "engines": {
+    "node": "8.x.x"
   }
 }
