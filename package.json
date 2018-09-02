@@ -1,48 +1,17 @@
 {
-  "name": "better-app-slim",
+  "name": "better-app",
   "version": "1.0.0",
   "description": "A slimmer version of the Better App meant to be more bottom-up rather than previous top-down.",
-  "main": "build/index.js",
+  "main": "build/server/index.js",
   "author": "Mackie Drew <mackiedrew@gmail.com>",
   "license": "MIT",
   "private": false,
   "scripts": {
-    "start": "node build/index.js",
-    "prestart": "npm run build",
-    "build": "babel source/ -d build/",
-    "prepare": "npm run build",
-    "test": "npm run flow && npm run lint",
-    "lint": "eslint .",
+    "start": "(cd server && npm start)",
+    "predeploy": "(cd server && npm run build) & (cd web && npm run build)",
     "deploy": "gcloud app deploy --quiet",
-    "predeploy": "npm run build",
     "logs": "gcloud app logs tail -s default",
     "live": "gcloud app browse"
-  },
-  "devDependencies": {
-    "babel-eslint": "8.2.6",
-    "eslint": "5.3.0",
-    "eslint-config-prettier": "2.9.0",
-    "eslint-plugin-eslint-comments": "3.0.1",
-    "eslint-plugin-flowtype": "2.50.0",
-    "eslint-plugin-fp": "2.3.0",
-    "eslint-plugin-import": "2.13.0",
-    "eslint-plugin-jsdoc": "3.7.1",
-    "eslint-plugin-prettier": "2.6.2",
-    "eslint-plugin-promise": "3.8.0",
-    "eslint-plugin-you-dont-need-lodash-underscore": "6.4.0",
-    "flow-bin": "0.78.0",
-    "prettier": "1.14.0"
-  },
-  "dependencies": {
-    "@google-cloud/debug-agent": "2.6.0",
-    "babel-cli": "6.26.0",
-    "babel-polyfill": "6.26.0",
-    "babel-preset-env": "1.7.0",
-    "babel-preset-flow": "6.23.0",
-    "express": "4.16.3",
-    "firebase-admin": "5.13.1",
-    "passport": "0.4.0",
-    "passport-fitbit-oauth2": "1.0.2"
   },
   "engines": {
     "node": "8.x.x"

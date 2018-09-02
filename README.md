@@ -1,4 +1,7 @@
 # Better App Slim
 
+- User account creation
 - Authenticate with Fitbit
-- Periodically store data in
+- Originally sync all available data from fitbit
+- Periodically store data from fitbit in Firestore
+
