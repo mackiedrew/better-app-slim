@@ -1,6 +1,7 @@
 # API keys and secrets
 .env
 serviceAccountKey.json
+fitbitEnv.json
 
 # Node
 node_modules

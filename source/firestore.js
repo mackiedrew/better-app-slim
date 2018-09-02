@@ -6,8 +6,8 @@
 
 import admin from "firebase-admin"
 
-import serviceAccount from "../serviceAccountKey"
+import { FIREBASE_ADMIN } from "./env"
 
-admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
+admin.initializeApp({ credential: admin.credential.cert(FIREBASE_ADMIN) })
 
 export default admin.firestore()
