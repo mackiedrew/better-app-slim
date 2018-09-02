@@ -15,16 +15,20 @@ process.on("unhandledRejection", err => {
 require("../config/env")
 
 const path = require("path")
+
 const chalk = require("chalk")
 const fs = require("fs-extra")
 const webpack = require("webpack")
-const config = require("../config/webpack.config.prod")
-const paths = require("../config/paths")
+
 const checkRequiredFiles = require("react-dev-utils/checkRequiredFiles")
 const formatWebpackMessages = require("react-dev-utils/formatWebpackMessages")
 const printHostingInstructions = require("react-dev-utils/printHostingInstructions")
 const FileSizeReporter = require("react-dev-utils/FileSizeReporter")
 const printBuildError = require("react-dev-utils/printBuildError")
+
+const paths = require("../config/paths")
+
+const config = require("../config/webpack.config.prod")
 
 const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild
@@ -90,6 +94,7 @@ measureFileSizesBeforeBuild(paths.appBuild)
       process.exit(1)
     },
   )
+  .catch(console.error)
 
 // Create the production build and print the deployment instructions.
 function build(previousFileSizes) {

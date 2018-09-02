@@ -2,18 +2,7 @@
   "name": "better-app",
   "version": "1.0.0",
   "description": "A slimmer version of the Better App meant to be more bottom-up rather than previous top-down.",
-  "main": "build/server/index.js",
   "author": "Mackie Drew <mackiedrew@gmail.com>",
   "license": "MIT",
-  "private": false,
-  "scripts": {
-    "start": "(cd server && npm start)",
-    "predeploy": "(cd server && npm run build) & (cd web && npm run build)",
-    "deploy": "gcloud app deploy --quiet",
-    "logs": "gcloud app logs tail -s default",
-    "live": "gcloud app browse"
-  },
-  "engines": {
-    "node": "8.x.x"
-  }
+  "private": false
 }

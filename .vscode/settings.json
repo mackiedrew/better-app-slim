@@ -16,6 +16,7 @@
         "polyfills",
         "precache",
         "predeploy",
+        "prestart",
         "typeof",
         "valueof"
     ],
