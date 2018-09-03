@@ -4,11 +4,13 @@ import type { $Request, $Response, $Next } from "express"
 
 import fetch from "node-fetch"
 
-import type { FitbitScopesType, FitbitAuthorizationPageParamsType } from "./types/FitbitTypes"
+import { FITBIT } from "../env"
 
-import { addUrlParams, joinParams } from "./helpers/url"
-import { FITBIT } from "./env"
-import { fitbitUsersCollection } from "./firestore/collections"
+import { fitbitUsersCollection } from "../firestore/collections"
+
+import type { FitbitScopesType, FitbitAuthorizationPageParamsType } from "../types/FitbitTypes"
+
+import { addUrlParams, joinParams } from "../helpers/url"
 
 /**
  * https://dev.fitbit.com/build/reference/web-api/oauth2/#authorization-page
@@ -57,18 +59,21 @@ export const processFitbitCodeToTokens = (request: $Request, response: $Response
   console.log("User ID:", userId)
   const fitbitUser = fitbitUsersCollection.doc(userId)
   fitbitUser
-    .set({
-      uid: userId,
-      accessCode: fitbitCode,
-    })
+    .set(
+      {
+        uid: userId,
+        accessCode: fitbitCode,
+      },
+      { merge: true },
+    )
     .then(() => {
       console.log("Wrote initial Fitbit User")
-      const Authorization = `Basic ${Buffer.from(`client_id:${FITBIT.clientSecret}`).toString(
-        "base64",
-      )}`
+      const Authorization = `Basic ${Buffer.from(
+        `${FITBIT.clientId}:${FITBIT.clientSecret}`,
+      ).toString("base64")}`
       const body = joinParams({
         code: fitbitCode,
-        client_id: FITBIT.client_id,
+        client_id: FITBIT.clientId,
         grant_type: "authorization_code",
         redirect_uri: FITBIT.callbackUrl,
         state: userId,
@@ -82,27 +87,26 @@ export const processFitbitCodeToTokens = (request: $Request, response: $Response
         },
         body,
       })
-        .then(fitbitResponse => {
-          console.log("Got Response!")
-          const tokens = fitbitResponse.json()
-          fitbitUser.set({
-            fitbitUserId: tokens.user_id,
-            tokenType: tokens.token_type,
-            accessToken: tokens.access_token,
-            refreshToken: tokens.refresh_token,
-            expiresIn: tokens.expires_in,
-          })
+        .then(res => res.json())
+        .then(data => {
+          console.log("Got Response!", JSON.stringify(data, null, 2))
+          fitbitUser.set(
+            {
+              fitbitUserId: data.user_id,
+              tokenType: data.token_type,
+              accessToken: data.access_token,
+              refreshToken: data.refresh_token,
+              expiresIn: data.expires_in,
+            },
+            { merge: true },
+          )
           return response.send(`Complete!`)
         })
         .catch(console.error)
     })
     .catch(console.error)
-  // Get access + refresh
-  // Store access + refresh
 }
 
 export const refreshTokens = () => {}
-
-export const makeRequest = () => {}
 
 // TODO: Account synchronization through API data access

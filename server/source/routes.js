@@ -1,8 +1,12 @@
 /* @flow */
+import path from "path"
+
 import App from "./app"
 
-import { getFitbitAuthorizationUri, processFitbitCodeToTokens } from "./fitbit"
+import { getFitbitAuthorizationUri, processFitbitCodeToTokens } from "./fitbit/fitbit"
 
-App.get("/test", (request, response) => response.send(request.query || "No Query!"))
+App.get("/web/*", (request, response) => {
+  response.sendFile(path.resolve(__dirname, "../build/web", "index.html"))
+})
 App.get("/fitbit-auth-url", getFitbitAuthorizationUri)
 App.get("/fitbit", processFitbitCodeToTokens)
