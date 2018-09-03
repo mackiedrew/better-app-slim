@@ -6,7 +6,10 @@ import firebase from "firebase/app"
 import { reduxFirestore, firestoreReducer } from "redux-firestore"
 import { devToolsEnhancer } from "redux-devtools-extension"
 
+import "firebase/auth"
+import "firebase/database"
 import "firebase/firestore"
+
 import history from "./history"
 
 const firebaseConfig = {
@@ -19,7 +22,7 @@ const firebaseConfig = {
 }
 
 const rrfConfig = {
-  userProfile: "users",
+  userProfile: null,
   useFirestoreForProfile: true,
 }
 
@@ -27,9 +30,9 @@ firebase.initializeApp(firebaseConfig)
 firebase.firestore()
 
 const createStoreWithFirebase = compose(
-  devToolsEnhancer({}),
   reactReduxFirebase(firebase, rrfConfig),
   reduxFirestore(firebase),
+  devToolsEnhancer({}),
 )(createStore)
 
 const rootReducer = combineReducers({
