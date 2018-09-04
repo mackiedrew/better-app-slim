@@ -4,15 +4,9 @@ import type { ResourceTypes, FitbitUserId, EndpointOptions } from "../types/Fitb
 
 import { dateToFitbitDate } from "../helpers/date"
 
-import { baseUrl } from "./constants"
-
+export const baseUrl = "https://api.fitbit.com"
 export const userEndPoint = `${baseUrl}/1/user`
 export const userEndPoint2 = `${baseUrl}/1.2/user`
-
-export const basicEndpoint = (resource: ResourceTypes, version: number = 1) => (
-  fitbitUserId: FitbitUserId,
-  extra?: string = "",
-) => `${version === 1 ? userEndPoint : userEndPoint2}/${fitbitUserId}/${resource}${extra}.json`
 
 /* eslint-disable-next-line complexity */
 export const createAccessOptions = (options: EndpointOptions) => {
