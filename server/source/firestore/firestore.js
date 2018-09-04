@@ -12,5 +12,7 @@ admin.initializeApp({
   credential: admin.credential.cert(FIREBASE_ADMIN),
   databaseURL: "https://better-app-4321.firebaseio.com",
 })
+const firebaseApi = admin.firestore()
+firebaseApi.settings({ timestampsInSnapshots: true })
 
-export default admin.firestore()
+export default firebaseApi

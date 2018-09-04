@@ -1,7 +1,7 @@
 /* @flow */
 import fetch from "node-fetch"
 
-import type { FitbitEndpoint, EndpointOptions } from "../types/FitbitTypes"
+import type { FitbitEndpoint, EndpointOptions, FitbitDate, FitbitTime } from "../types/FitbitTypes"
 
 import { fitbitUsersCollection } from "../firestore/collections"
 
@@ -33,7 +33,7 @@ export const get = async (
   return data
 }
 
-export const convertToRealDate = (date, time) => {
+export const convertToRealDate = (date: FitbitDate, time: FitbitTime) => {
   const splitDate = date.split("-").map(parseFloat)
   const splitTime = time.split(":").map(parseFloat)
   return new Date(
@@ -44,6 +44,13 @@ export const convertToRealDate = (date, time) => {
     splitTime[1],
     splitTime[2],
   )
+}
+
+export const storeProfileInFirestore = async (userId: string) => {
+  const fitbitResponse = await get(userId, profile)
+  const user = fitbitResponse && fitbitResponse.user ? fitbitResponse.user : {}
+  const fitbitUser = fitbitUsersCollection.doc(userId)
+  fitbitUser.set({ profile: user }, { merge: true })
 }
 
 export const storeMassInFirestore = async () => {
@@ -155,5 +162,26 @@ export const storeActivityInFirestore = async () => {
     }
   })
 }
-// storeActivityInFirestore()
+
+// Sync the last week because it's possible that old data has been updated
+export const syncUserLastWeek = async (userId: string) => {
+  console.log(userId)
+  const oneWeekAgo = new Date()
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+  await storeProfileInFirestore(userId)
+  // Weight 1w
+  // Fat 1w
+  // Sleep 1d * 7
+  // Activity Summary 1d * 7
+}
+
+export const syncAllUsersLastWeek = async () => {
+  const querySnapshot = await fitbitUsersCollection.get()
+  const docSnapshots = querySnapshot.docs
+  const userIds = docSnapshots.map(({ id }) => id)
+  userIds.forEach(syncUserLastWeek)
+}
+
+// syncAllUsersLastWeek()
+
 export default get
