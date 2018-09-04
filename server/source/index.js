@@ -1,5 +1,7 @@
 /* @flow */
 
+import "@babel/polyfill"
+
 import { IS_PRODUCTION } from "./env"
 import "./fitbit/request"
 
