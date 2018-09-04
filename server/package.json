@@ -1,6 +1,6 @@
 {
   "name": "better-app-server",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "",
   "main": "build/index.js",
   "author": "Mackie Drew <mackiedrew@gmail.com>",
@@ -14,7 +14,7 @@
     "test": "npm run flow && npm run lint",
     "lint": "eslint .",
     "predeploy": "npm run build",
-    "deploy": "gcloud app deploy --quiet --version 1-0-6",
+    "deploy": "gcloud app deploy --quiet --version 1-0-7",
     "logs": "gcloud app logs tail -s default",
     "live": "gcloud app browse"
   },
