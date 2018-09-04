@@ -1,7 +1,13 @@
 /* @flow */
+// Required to be first for Google Cloud Platform debugging service
+if (process.env.NODE_ENV === "production") require("@google-cloud/debug-agent").start()
+
+/* eslint-disable import/first */
+import "@babel/polyfill"
 
 import serviceAccount from "../.env/serviceAccountKey"
 import fitbitEnv from "../.env/fitbitEnv"
+/* eslint-enable import/first */
 
 export const IS_PRODUCTION = process.env.NODE_ENV === "production"
 export const IS_DEVELOPMENT = !IS_PRODUCTION
