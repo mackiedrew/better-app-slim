@@ -3,7 +3,7 @@ import React, { Component } from "react"
 import { compose } from "recompose"
 import { connect } from "react-redux"
 
-import UserActions from "../organisms/UserActions"
+import SummaryTable from "../organisms/SummaryTable"
 import LoginForm from "../organisms/LoginForm"
 
 type Props = {
@@ -22,14 +22,16 @@ class LoginPage extends Component<Props, State> {
       .then(response => response.text().then(url => this.setState({ url })))
       .catch(console.error)
   }
+  /* eslint-disable-next-line complexity */
   render() {
     const url = this.state.url || ""
     const uid = this.props.uid || ""
 
     return (
       <div>
-        {this.props.loggedIn ? <UserActions /> : <LoginForm />}
+        {!this.props.loggedIn ? <LoginForm /> : null}
         {uid ? <a href={`${url}&state=${uid}`}>Authorize Better With Fitbit</a> : null}
+        {uid ? <SummaryTable /> : null}
       </div>
     )
   }
