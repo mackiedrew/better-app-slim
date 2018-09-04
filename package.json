@@ -4,5 +4,8 @@
   "description": "A slimmer version of the Better App meant to be more bottom-up rather than previous top-down.",
   "author": "Mackie Drew <mackiedrew@gmail.com>",
   "license": "MIT",
-  "private": false
+  "private": false,
+  "scripts": {
+    "deploy": "(cd web && npm run deploy) & (cd web && npm run deploy)"
+  }
 }
