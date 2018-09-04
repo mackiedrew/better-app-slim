@@ -1,17 +1,21 @@
 /* @flow */
 import fetch from "node-fetch"
 
-import type { FitbitEndpoint, EndpointOptions, FitbitDate, FitbitTime } from "../types/FitbitTypes"
+import type { FitbitEndpoint, EndpointOptions } from "../types/FitbitTypes"
 
 import { fitbitUsersCollection } from "../firestore/collections"
 
+import { fitbitToRealDate } from "../helpers/date"
+
 import { weight, profile, bodyFat, sleep, dailyActivity } from "./endpoints"
+import { refreshTokens } from "./authorization"
 
 export const get = async (
   userId: string,
   endpointCallback: FitbitEndpoint,
   options: EndpointOptions = {},
 ): Promise<{} | void> => {
+  await refreshTokens(userId)
   const fitbitUser = fitbitUsersCollection.doc(userId)
   // Get accessToken & refresh token from user
   let fitbitUserData
@@ -33,24 +37,11 @@ export const get = async (
   return data
 }
 
-export const convertToRealDate = (date: FitbitDate, time: FitbitTime) => {
-  const splitDate = date.split("-").map(parseFloat)
-  const splitTime = time.split(":").map(parseFloat)
-  return new Date(
-    splitDate[0],
-    splitDate[1] - 1,
-    splitDate[2],
-    splitTime[0],
-    splitTime[1],
-    splitTime[2],
-  )
-}
-
 export const storeProfileInFirestore = async (userId: string) => {
   const fitbitResponse = await get(userId, profile)
   const user = fitbitResponse && fitbitResponse.user ? fitbitResponse.user : {}
   const fitbitUser = fitbitUsersCollection.doc(userId)
-  fitbitUser.set({ profile: user }, { merge: true })
+  fitbitUser.update({ profile: user }, { merge: true })
 }
 
 export const storeMassInFirestore = async () => {
@@ -71,7 +62,7 @@ export const storeMassInFirestore = async () => {
           {
             logId: massLog.logId,
             bmi: massLog.bmi,
-            dateTime: convertToRealDate(massLog.date, massLog.time),
+            dateTime: fitbitToRealDate(massLog.date, massLog.time),
             source: massLog.source,
             weight: massLog.weight,
           },
@@ -100,7 +91,7 @@ export const storeBodyFatInFirestore = async () => {
             logId: log.logId,
             source: log.source,
             fat: log.fat,
-            dateTime: convertToRealDate(log.date, log.time),
+            dateTime: fitbitToRealDate(log.date, log.time),
           },
           { merge: true },
         )
@@ -136,30 +127,23 @@ export const storeSleepInFirestore = async () => {
   })
 }
 
-export const storeActivityInFirestore = async () => {
-  const userId = "r4XJfHyPlmSRs9mWbomikPikKLI2"
-  const dates = [...new Array(1525)].map((_, i) => {
-    const startDate = new Date(2014, 6, 1)
-    return new Date(startDate.setDate(startDate.getDate() + i + 1))
-  })
+export const syncActivity = async (userId: string, startDate: Date, days: number) => {
+  const dates = [...new Array(1525)].map(
+    (_, i) => new Date(startDate.setDate(startDate.getDate() + i + 1)),
+  )
   dates.forEach(async date => {
     const data = await get(userId, dailyActivity, { date })
-    if (data.success === false) return
     const fitbitUser = fitbitUsersCollection.doc(userId)
-    try {
-      await fitbitUser
-        .collection("activitySummary")
-        .doc(`${date.toISOString()}`)
-        .set(
-          {
-            ...data,
-            date,
-          },
-          { merge: true },
-        )
-    } catch (error) {
-      console.error(date.toISOString())
-    }
+    await fitbitUser
+      .collection("activitySummary")
+      .doc(`${date.toISOString()}`)
+      .set(
+        {
+          ...data,
+          date,
+        },
+        { merge: true },
+      )
   })
 }
 

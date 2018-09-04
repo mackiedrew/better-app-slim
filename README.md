@@ -9,3 +9,5 @@
 - Use refresh token
 - Setup cron job
 - Create BASIC frontend usability
+- Deal with rate limiting
+- Create onboarding step

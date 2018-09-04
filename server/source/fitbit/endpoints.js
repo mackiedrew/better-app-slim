@@ -1,20 +1,13 @@
 /* @flow */
 
-import type {
-  ResourceTypes,
-  FitbitUserId,
-  FitbitDate,
-  EndpointOptions,
-  FitbitTime,
-} from "../types/FitbitTypes"
+import type { ResourceTypes, FitbitUserId, EndpointOptions } from "../types/FitbitTypes"
+
+import { dateToFitbitDate } from "../helpers/date"
 
 import { baseUrl } from "./constants"
 
 export const userEndPoint = `${baseUrl}/1/user`
 export const userEndPoint2 = `${baseUrl}/1.2/user`
-
-export const getFitbitDate = (date: Date): FitbitDate => date.toISOString().split("T")[0]
-export const getFitbitTime = (date: Date): FitbitTime => date.toISOString().split("T")[1]
 
 export const basicEndpoint = (resource: ResourceTypes, version: number = 1) => (
   fitbitUserId: FitbitUserId,
@@ -24,9 +17,9 @@ export const basicEndpoint = (resource: ResourceTypes, version: number = 1) => (
 /* eslint-disable-next-line complexity */
 export const createAccessOptions = (options: EndpointOptions) => {
   if (options.baseDate && options.endDate)
-    return `/${getFitbitDate(options.baseDate)}/${getFitbitDate(options.endDate)}`
-  if (options.date && options.period) return `/${getFitbitDate(options.date)}/${options.period}`
-  if (options.date) return `/${getFitbitDate(options.date)}`
+    return `/${dateToFitbitDate(options.baseDate)}/${dateToFitbitDate(options.endDate)}`
+  if (options.date && options.period) return `/${dateToFitbitDate(options.date)}/${options.period}`
+  if (options.date) return `/${dateToFitbitDate(options.date)}`
   return ""
 }
 
