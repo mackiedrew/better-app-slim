@@ -1,16 +1,18 @@
 /* @flow */
 import React, { Component } from "react"
+import styled from "styled-components"
 import { compose } from "recompose"
 import { connect } from "react-redux"
 import { withFirebase, firestoreConnect } from "react-redux-firebase"
 
 import type { FirebaseType } from "../types/FirebaseType"
+import { fireStoreDateToDate } from "../helpers/date"
 
 import Cell from "../templates/Cell"
 import Row from "../templates/Row"
 import Column from "../templates/Column"
 
-const StyledRow = Row.extend`
+const StyledRow = styled(Row)`
   background-color: #dddddd;
   margin-bottom: 0.5rem;
 `
@@ -30,7 +32,6 @@ class SummaryTable extends Component<Props, State> {
   static defaultProps = {}
   state = { massLogs: [], bodyFatLogs: [] }
   async componentDidMount() {
-    console.log(this.props.firestore)
     const massLogs = await this.props.firestore
       .collection("fitbit_users")
       .doc(this.props.uid)
@@ -54,7 +55,7 @@ class SummaryTable extends Component<Props, State> {
       <Column>
         {this.state.massLogs.map(({ weight, logId, dateTime }, index) => (
           <StyledRow key={`${logId}-${index}`}>
-            <Cell>Date: {dateTime.toDateString()}</Cell>
+            <Cell>Date: {fireStoreDateToDate(dateTime).toDateString()}</Cell>
             <Cell>Mass: {weight}</Cell>
             <Cell>BF%: {this.state.bodyFatLogs[index].fat}</Cell>
           </StyledRow>
