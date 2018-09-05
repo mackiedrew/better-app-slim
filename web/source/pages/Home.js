@@ -5,33 +5,20 @@ import { connect } from "react-redux"
 
 import SummaryTable from "../organisms/SummaryTable"
 import LoginForm from "../organisms/LoginForm"
+import FitbitActions from "../organisms/FitbitActions"
 
 type Props = {
   uid: string | null,
   loggedIn: boolean,
 }
 
-type State = {
-  url: string | null,
-}
-
-class LoginPage extends Component<Props, State> {
-  state = { url: null, uid: null }
-  componentDidMount() {
-    fetch("https://better-app-4321.appspot.com/fitbit-auth-url")
-      .then(response => response.text().then(url => this.setState({ url })))
-      .catch(console.error)
-  }
-  /* eslint-disable-next-line complexity */
+class LoginPage extends Component<Props> {
   render() {
-    const url = this.state.url || ""
-    const uid = this.props.uid || ""
-
     return (
       <div>
         {!this.props.loggedIn ? <LoginForm /> : null}
-        {uid ? <a href={`${url}&state=${uid}`}>Authorize Better With Fitbit</a> : null}
-        {uid ? <SummaryTable /> : null}
+        {this.props.loggedIn ? <FitbitActions /> : null}
+        {this.props.loggedIn ? <SummaryTable /> : null}
       </div>
     )
   }
