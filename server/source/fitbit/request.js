@@ -3,11 +3,18 @@ import fetch from "node-fetch"
 
 import type { $Request, $Response } from "express"
 
-import type { FitbitEndpoint, EndpointOptions } from "../types/FitbitTypes"
+import type { FitbitEndpoint, EndpointOptions, EndpointDateOnly } from "../types/FitbitTypes"
 
 import { fitbitUsersCollection } from "../firestore/collections"
 
-import { fitbitToRealDate, getPastDate, dateRange } from "../helpers/date"
+import {
+  fitbitToRealDate,
+  getPastDate,
+  dateRange,
+  getMonthsBetween,
+  getDaysBetween,
+  lotsOfDate,
+} from "../helpers/date"
 
 import { safeFirestoreInput } from "../firestore/helpers"
 
@@ -46,37 +53,38 @@ export const syncProfile = async (userId: string) => {
   fitbitUser.update(safeFirestoreInput({ profile: user }), { merge: true })
 }
 
-export const syncMass = async (userId: string, date: Date) => {
-  const rawWeights =
-    ((await get(userId, endpoints.weight, { date })) || { weight: [] }).weight || {}
+export const syncMass = async (userId: string, options: EndpointOptions) => {
+  const rawWeights = ((await get(userId, endpoints.weight, options)) || { weight: [] }).weight || {}
   const weights = rawWeights instanceof Array ? rawWeights : []
   const fitbitUser = fitbitUsersCollection.doc(userId)
   weights.map(massLog => {
     const { logId, bmi, date: fitbitDate, time, source, weight } = massLog
-    const dateTime = fitbitToRealDate(fitbitDate, time)
+    const date = fitbitToRealDate(fitbitDate, time)
+    const dateSet = lotsOfDate(date)
     fitbitUser
       .collection("massLogs")
       .doc(`${logId}`)
-      .set(safeFirestoreInput({ logId, bmi, dateTime, source, weight }), { merge: true })
+      .set(safeFirestoreInput({ logId, bmi, ...dateSet, source, weight }), { merge: true })
   })
 }
 
-export const syncBodyFat = async (userId: string, date: Date) => {
-  const rawBodyFatLogs = ((await get(userId, endpoints.bodyFat, { date })) || { fat: [] }).fat || {}
+export const syncBodyFat = async (userId: string, options: EndpointOptions) => {
+  const rawBodyFatLogs = ((await get(userId, endpoints.bodyFat, options)) || { fat: [] }).fat || {}
   const bodyFatLogs = rawBodyFatLogs instanceof Array ? rawBodyFatLogs : []
   const fitbitUser = fitbitUsersCollection.doc(userId)
   bodyFatLogs.map(bodyFatLog => {
     const { logId, fat, date: fitbitDate, time, source } = bodyFatLog
-    const dateTime = fitbitToRealDate(fitbitDate, time)
+    const date = fitbitToRealDate(fitbitDate, time)
+    const dateSet = lotsOfDate(date)
     fitbitUser
       .collection("bodyFatLogs")
       .doc(`${logId}`)
-      .set(safeFirestoreInput({ logId, source, fat, dateTime }), { merge: true })
+      .set(safeFirestoreInput({ logId, source, fat, ...dateSet }), { merge: true })
   })
 }
 
-export const syncSleep = async (userId: string, date: Date) => {
-  const rawSleepLogs = ((await get(userId, endpoints.sleep, { date })) || { sleep: [] }).sleep || {}
+export const syncSleep = async (userId: string, options: EndpointOptions) => {
+  const rawSleepLogs = ((await get(userId, endpoints.sleep, options)) || { sleep: [] }).sleep || {}
   const sleepLogs = rawSleepLogs instanceof Array ? rawSleepLogs : []
   sleepLogs.map(async log => {
     await fitbitUsersCollection
@@ -87,13 +95,13 @@ export const syncSleep = async (userId: string, date: Date) => {
   })
 }
 
-export const syncActivitySummary = async (userId: string, date: Date) => {
-  const data = await get(userId, endpoints.dailyActivity, { date })
+export const syncActivitySummary = async (userId: string, options: EndpointDateOnly) => {
+  const data = await get(userId, endpoints.dailyActivity, options)
   await fitbitUsersCollection
     .doc(userId)
     .collection("activitySummary")
-    .doc(date.toDateString())
-    .set(safeFirestoreInput({ ...data, date }), { merge: true })
+    .doc(options.date.toDateString())
+    .set(safeFirestoreInput({ ...data, date: options.date }), { merge: true })
 }
 
 export const getAllUserIds = async () => {
@@ -106,10 +114,10 @@ export const getAllUserIds = async () => {
 // Sync the last week because it's possible that old data has been updated
 export const syncDayOneUser = async (userId: string, date: Date = new Date()) => {
   await syncProfile(userId)
-  await syncMass(userId, date)
-  await syncSleep(userId, date)
-  await syncBodyFat(userId, date)
-  await syncActivitySummary(userId, date)
+  await syncMass(userId, { date })
+  await syncBodyFat(userId, { date })
+  await syncSleep(userId, { date })
+  await syncActivitySummary(userId, { date })
   return true
 }
 
@@ -120,10 +128,10 @@ export const syncWeekOneUser = async (userId: string) => {
   await syncProfile(userId)
   return await Promise.all(
     dateRange(daysAgo, oneWeekAgo).map(async date => {
-      await syncMass(userId, date)
-      await syncSleep(userId, date)
-      await syncBodyFat(userId, date)
-      await syncActivitySummary(userId, date)
+      await syncMass(userId, { date })
+      await syncBodyFat(userId, { date })
+      await syncSleep(userId, { date })
+      await syncActivitySummary(userId, { date })
     }),
   )
 }
@@ -157,3 +165,37 @@ export const syncWeek = async (request: $Request, response: $Response) => {
   response.header("Access-Control-Allow-Headers", "X-Requested-With")
   response.send("Synced!")
 }
+
+export const getFitbitUser = async (uid: string) => {
+  const fitbitUser = fitbitUsersCollection.doc(uid)
+  const fitbitUserDoc = await fitbitUser.get()
+  const fitbitUserData = await fitbitUserDoc.data()
+  return fitbitUserData
+}
+
+export const fullSync = async (uid: string) => {
+  await syncProfile(uid)
+  const { profile } = await getFitbitUser(uid)
+  const earliestDataDate = new Date(...profile.memberSince.split("-").map(parseFloat))
+  const today = new Date()
+  const monthsToSync = getMonthsBetween(earliestDataDate, today)
+  // const daysBetween = getDaysBetween(earliestDataDate, today)
+  // const daysToSync = dateRange(daysBetween, earliestDataDate)
+  await Promise.all(
+    monthsToSync.map(async date => {
+      await syncMass(uid, { date, period: "1m" })
+      // await syncBodyFat(uid, { date, period: "1m" })
+    }),
+  )
+  // await Promise.all(
+  //   daysToSync.map(async date => {
+  //     await syncMass(uid, { date, period: "1m" })
+  //     await syncBodyFat(uid, { date, period: "1m" })
+  //     //
+  //     // Food Logs
+  //   }),
+  // )
+  console.log(monthsToSync)
+}
+
+// fullSync("r4XJfHyPlmSRs9mWbomikPikKLI2")

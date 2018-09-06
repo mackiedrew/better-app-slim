@@ -11,3 +11,10 @@
 - Create BASIC frontend usability
 - Deal with rate limiting
 - Create onboarding step
+
+
+SYNC BEGINNING OF TIME FITBIT
+STORE DATESTRING
+STORE TIMESTRING
+STORE DATETIMESTRING
+

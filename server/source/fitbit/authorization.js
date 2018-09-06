@@ -9,7 +9,7 @@ import type { FitbitScopesType, FitbitAuthorizationPageParamsType } from "../typ
 
 import { addUrlParams, joinParams } from "../helpers/url"
 
-export const requestedScopes: FitbitScopesType[] = [
+const requestedScopes: FitbitScopesType[] = [
   "activity",
   "location",
   "heartrate",
@@ -21,7 +21,7 @@ export const requestedScopes: FitbitScopesType[] = [
   "weight",
 ]
 
-export const authorizationHeader = `Basic ${Buffer.from(
+const authorizationHeader = `Basic ${Buffer.from(
   `${FITBIT.clientId}:${FITBIT.clientSecret}`,
 ).toString("base64")}`
 
@@ -57,8 +57,8 @@ export const processFitbitCodeToTokens = async (request: $Request, response: $Re
     },
     body,
   })
-  const data = fitbitResponse.json()
-  fitbitUser.update(
+  const data = await fitbitResponse.json()
+  await fitbitUser.update(
     {
       fitbitUserId: data.user_id,
       tokenType: data.token_type,
@@ -68,7 +68,6 @@ export const processFitbitCodeToTokens = async (request: $Request, response: $Re
     },
     { merge: true },
   )
-
   response.header("Access-Control-Allow-Origin", "*")
   response.header("Access-Control-Allow-Headers", "X-Requested-With")
   response.send(`Fitbit Authorized!`)
@@ -77,7 +76,6 @@ export const processFitbitCodeToTokens = async (request: $Request, response: $Re
 export const refreshTokens = async (userId: string) => {
   const fitbitUser = fitbitUsersCollection.doc(userId)
   const refreshToken = (await fitbitUser.get()).data().refreshToken
-
   const response = await fetch(FITBIT.refreshTokenRequestUri, {
     method: "POST",
     headers: {

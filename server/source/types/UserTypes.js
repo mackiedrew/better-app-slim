@@ -1,16 +1,27 @@
 /* @flow */
-import type { Mass, Height, Percentage, } from "../types/HealthTypes"
+import type { Gender } from "./HealthTypes"
 
 export type Summary = {|
   date: Date,
-  lastUpdated: Date,
-  goals: {
-    mass: Mass,
-    bodyFat: Percentage,
-  },
-  mass: Mass,
-  height: Height,
-  bodyFat: Percentage,
+  dateString: string, // "YYYY-MM-DD"
+  timeString: string, // "HH-MM-SS"
+  dateTimeString: string, // "YYYY-MM-DD-HH-MM-SS"
+  unixTimestamp: number,
+  mass: {|
+    min: number | null,
+    max: number | null,
+    mean: number | null,
+    values: number[],
+  |},
+  bodyFat: {|
+    min: number | null,
+    max: number | null,
+    mean: number | null,
+    values: number[],
+  |},
+  height: number,
+  age: number,
+  gender: Gender,
 |}
 
 export type User = {|
