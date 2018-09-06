@@ -6,10 +6,12 @@ const path = require("path")
 const paths = require("./paths")
 
 // Make sure that including paths.js after env.js will read .env variables.
+/* eslint-disable-next-line fp/no-delete */
 delete require.cache[require.resolve("./paths")]
 
 const NODE_ENV = process.env.NODE_ENV
 if (!NODE_ENV) {
+  /* eslint-disable-next-line fp/no-throw */
   throw new Error("The NODE_ENV environment variable is required but was not specified.")
 }
 
