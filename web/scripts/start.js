@@ -8,6 +8,7 @@ process.env.NODE_ENV = "development"
 // ignoring them. In the future, promise rejections that are not handled will
 // terminate the Node.js process with a non-zero exit code.
 process.on("unhandledRejection", err => {
+  /* eslint-disable-next-line fp/no-throw */
   throw err
 })
 
@@ -15,6 +16,7 @@ process.on("unhandledRejection", err => {
 require("../config/env")
 
 const fs = require("fs")
+
 const chalk = require("chalk")
 const webpack = require("webpack")
 const WebpackDevServer = require("webpack-dev-server")
@@ -27,6 +29,7 @@ const {
   prepareUrls,
 } = require("react-dev-utils/WebpackDevServerUtils")
 const openBrowser = require("react-dev-utils/openBrowser")
+
 const paths = require("../config/paths")
 const config = require("../config/webpack.config.dev")
 const createDevServerConfig = require("../config/webpackDevServer.config")
@@ -53,7 +56,6 @@ if (process.env.HOST) {
   )
   console.log(`If this was unintentional, check that you haven't mistakenly set it in your shell.`)
   console.log(`Learn more here: ${chalk.yellow("http://bit.ly/2mwWSwH")}`)
-  console.log()
 }
 
 // We attempt to use the default port but if it is busy, we offer the user to
@@ -86,13 +88,13 @@ choosePort(HOST, DEFAULT_PORT)
       console.log(chalk.cyan("Starting the development server...\n"))
       openBrowser(urls.localUrlForBrowser)
     })
-
-    ;["SIGINT", "SIGTERM"].forEach((sig) => {
-      process.on(sig, function() {
-        devServer.close();
-        process.exit();
-      });
+    ;["SIGINT", "SIGTERM"].forEach(sig => {
+      process.on(sig, () => {
+        devServer.close()
+        process.exit()
+      })
     })
+    return true
   })
   .catch(err => {
     if (err && err.message) {
