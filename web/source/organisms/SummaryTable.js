@@ -8,9 +8,6 @@ import { withFirebase, firestoreConnect } from "react-redux-firebase"
 import moment from "moment"
 
 import type { FirebaseType } from "../types/FirebaseType"
-import { fireStoreDateToDate } from "../helpers/date"
-
-import { getLogsFromDay } from "../helpers/dailySummary"
 
 import PeriodicCell from "../molecules/PeriodicCell"
 import Row from "../templates/Row"
@@ -42,31 +39,46 @@ class SummaryTable extends Component<Props, State> {
       .collection("fitbit_users")
       .doc(this.props.uid)
       .collection("massLogs")
-      .orderBy("dateTime", "desc")
+      .orderBy("unixTimestamp", "desc")
       .limit(21)
       .get()
     const bodyFatLogs = await this.props.firestore
       .collection("fitbit_users")
       .doc(this.props.uid)
       .collection("bodyFatLogs")
-      .orderBy("dateTime", "desc")
+      .orderBy("unixTimestamp", "desc")
       .limit(21)
       .get()
-    console.log(await getLogsFromDay(this.props.firestore, this.props.uid, new Date(2018, 9, 4)))
     const massLogData = await Promise.all(massLogs.docs.map(async doc => doc.data()))
     const bodyFatLogsData = await Promise.all(bodyFatLogs.docs.map(async doc => doc.data()))
     this.setState({ massLogs: massLogData, bodyFatLogs: bodyFatLogsData })
   }
   render() {
+    const { massLogs } = this.state
     return (
       <Section title="Summary">
-        {this.state.massLogs.map(({ weight, logId, dateTime }, index) => {
-          const date = moment(fireStoreDateToDate(dateTime))
+        {massLogs.map(({ weight, logId, unixTimestamp }, index) => {
+          const date = moment(unixTimestamp)
+          const lastMassRecordIndex = Math.min(index + 1, massLogs.length - 1)
+          const lastMassRecord = massLogs[lastMassRecordIndex]
+          const lostMass = weight <= lastMassRecord.weight
+          const massSentiment = lostMass ? "GOOD" : "BAD"
           return (
             <StyledRow key={`${logId}-${index}`}>
               <PeriodicCell label="date" unit={date.format("MMM")} value={date.format("DD")} />
-              <PeriodicCell range={{ min: 0.2, max: 0.5 }} label="mass" unit="kg" value={weight} />
-              <PeriodicCell label="bodyFat" unit="%" value={this.state.bodyFatLogs[index].fat} />
+              <PeriodicCell
+                sentiment={massSentiment}
+                range={{ min: 0.2, max: 0.5 }}
+                label="mass"
+                unit="kg"
+                value={weight}
+              />
+              <PeriodicCell
+                sentiment="MIXED"
+                label="bodyFat"
+                unit="%"
+                value={this.state.bodyFatLogs[index].fat}
+              />
             </StyledRow>
           )
         })}

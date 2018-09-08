@@ -14,6 +14,7 @@ import {
   getMonthsBetween,
   getDaysBetween,
   lotsOfDate,
+  dateToFitbitTime,
 } from "../helpers/date"
 
 import { safeFirestoreInput } from "../firestore/helpers"
@@ -39,8 +40,19 @@ export const get = async (
   // Construct query
   const Authorization = `Bearer ${fitbitUserData.accessToken}`
   const endpoint = endpointCallback(fitbitUserData.fitbitUserId)(options)
-  console.log(endpoint)
+  console.log(`Calling: ${endpoint}`)
   const response = await fetch(endpoint, { method: "GET", headers: { Authorization } })
+  const headers = response.headers
+  const apiHealth = {
+    remaining: headers.get("fitbit-rate-limit-remaining"),
+    limit: headers.get("fitbit-rate-limit-limit"),
+    reset: headers.get("fitbit-rate-limit-reset"),
+  }
+  console.log(
+    `Remaining calls this hour: ${apiHealth.remaining} / ${apiHealth.limit} for another ${Math.ceil(
+      apiHealth.reset / 60,
+    )}min`,
+  )
   const data = await response.json()
   if (data.success === false) console.log(response.headers)
   return data
@@ -97,11 +109,12 @@ export const syncSleep = async (userId: string, options: EndpointOptions) => {
 
 export const syncActivitySummary = async (userId: string, options: EndpointDateOnly) => {
   const data = await get(userId, endpoints.dailyActivity, options)
+  const dateSet = lotsOfDate(options.date)
   await fitbitUsersCollection
     .doc(userId)
     .collection("activitySummary")
     .doc(options.date.toDateString())
-    .set(safeFirestoreInput({ ...data, date: options.date }), { merge: true })
+    .set(safeFirestoreInput({ ...data, ...dateSet }), { merge: true })
 }
 
 export const getAllUserIds = async () => {
@@ -126,6 +139,7 @@ export const syncWeekOneUser = async (userId: string) => {
   const daysAgo = 7
   const oneWeekAgo = getPastDate(daysAgo)
   await syncProfile(userId)
+  console.log(oneWeekAgo)
   return await Promise.all(
     dateRange(daysAgo, oneWeekAgo).map(async date => {
       await syncMass(userId, { date })
@@ -177,25 +191,23 @@ export const fullSync = async (uid: string) => {
   await syncProfile(uid)
   const { profile } = await getFitbitUser(uid)
   const earliestDataDate = new Date(...profile.memberSince.split("-").map(parseFloat))
-  const today = new Date()
+  const today = new Date(earliestDataDate.getFullYear(), earliestDataDate.getMonth)
   const monthsToSync = getMonthsBetween(earliestDataDate, today)
-  // const daysBetween = getDaysBetween(earliestDataDate, today)
-  // const daysToSync = dateRange(daysBetween, earliestDataDate)
+  const daysBetween = getDaysBetween(earliestDataDate, today)
+  const daysToSync = dateRange(daysBetween, earliestDataDate)
   await Promise.all(
     monthsToSync.map(async date => {
-      await syncMass(uid, { date, period: "1m" })
+      // await syncMass(uid, { date, period: "1m" })
       // await syncBodyFat(uid, { date, period: "1m" })
     }),
   )
-  // await Promise.all(
-  //   daysToSync.map(async date => {
-  //     await syncMass(uid, { date, period: "1m" })
-  //     await syncBodyFat(uid, { date, period: "1m" })
-  //     //
-  //     // Food Logs
-  //   }),
-  // )
-  console.log(monthsToSync)
+  await Promise.all(
+    daysToSync.map(async date => {
+      await syncActivitySummary(uid, { date })
+      // Food Logs
+    }),
+  )
 }
 
 // fullSync("r4XJfHyPlmSRs9mWbomikPikKLI2")
+// syncWeekWithoutResponse()

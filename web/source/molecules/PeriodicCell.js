@@ -7,8 +7,20 @@ const Container = styled.div`
   flex-flow: column nowrap;
   flex: 0;
   flex-basis: 5rem;
-  background-color: white;
-  color: #555555;
+  background-color: ${({ sentiment, theme }) => {
+    switch (sentiment) {
+      case "GOOD":
+        return theme.color.green
+      case "BAD":
+        return theme.color.red
+      case "MIXED":
+        return theme.color.yellow
+      case "NONE":
+      default:
+        return "white"
+    }
+  }};
+  color: ${({ theme }) => theme.color.nearlyBlack};
   height: 5rem;
   align-items: center;
   overflow: hidden;
@@ -19,8 +31,8 @@ const Value = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  font-weight: 200;
-  font-size: 1.2rem;
+  font-weight: 300;
+  font-size: 1.4rem;
   flex: 1;
 `
 
@@ -29,9 +41,9 @@ const Unit = styled.span`
   padding: 0;
   font-weight: bold;
   align-self: center;
-  font-weight: 100;
+  font-weight: 200;
   margin-top: -0.2rem;
-  font-size: 0.7rem;
+  font-size: 0.9rem;
 `
 
 const Label = styled.div`
@@ -40,12 +52,12 @@ const Label = styled.div`
   justify-content: flex-end;
   justify-items: flex-end;
   align-items: flex-end;
-  color: #333333;
+  color: ${({ theme }) => theme.color.nearlyBlack};
   font-weight: 700;
   letter-spacing: -1px;
   margin-right: 1px;
   margin-bottom: -0.2em;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   flex: 0.6;
 `
 
@@ -54,7 +66,7 @@ const Range = styled.div`
   justify-content: space-between;
   width: 100%;
   flex-shrink: 0;
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   padding: 0 0.15rem;
 `
 
@@ -70,6 +82,7 @@ type Props = {
   value: number | string,
   label: string,
   unit: string,
+  sentiment?: "BAD" | "GOOD" | "MIXED" | "NONE",
   range?: {|
     min: number,
     max: number,
@@ -77,12 +90,15 @@ type Props = {
 }
 
 class PeriodicCell extends Component<Props> {
+  static defaultProps = {
+    sentiment: "NONE",
+  }
   render() {
-    const { label, unit, value, range } = this.props
+    const { label, unit, value, range, sentiment } = this.props
     const less = range ? `-${range.min}` : " "
     const more = range ? `+${range.max}` : " "
     return (
-      <Container>
+      <Container sentiment={sentiment}>
         <Range>
           <Less>{less}</Less>
           <More>{more}</More>

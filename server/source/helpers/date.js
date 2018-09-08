@@ -25,7 +25,8 @@ export const dateToFitbitTime = (date: Date): FitbitTime =>
   date
     .toISOString()
     .split("T")[1]
-    .split[0].split(":")
+    .split(".")[0]
+    .split(":")
     .join("-")
 
 export const getMonthsBetween = (startDate: Date, endDate: Date): Date[] => {
