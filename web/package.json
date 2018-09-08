@@ -114,6 +114,7 @@
     "eslint-plugin-promise": "3.8.0",
     "eslint-plugin-react": "7.11.1",
     "eslint-plugin-you-dont-need-lodash-underscore": "6.4.0",
-    "extract-text-webpack-plugin": "3.0.2"
+    "extract-text-webpack-plugin": "3.0.2",
+    "robotstxt-webpack-plugin": "^4.0.1"
   }
 }
