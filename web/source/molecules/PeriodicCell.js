@@ -2,6 +2,8 @@
 import React, { Component } from "react"
 import styled from "styled-components"
 
+import { toFixed } from "../helpers/round"
+
 const Container = styled.div`
   display: flex;
   flex-flow: column nowrap;
@@ -78,7 +80,8 @@ const More = styled.div`
   font-weight: 700;
 `
 
-type Props = {
+export type PeriodicCellProps = {
+  decimals?: number,
   value: number | string,
   label: string,
   unit: string,
@@ -89,21 +92,22 @@ type Props = {
   |},
 }
 
-class PeriodicCell extends Component<Props> {
+class PeriodicCell extends Component<PeriodicCellProps> {
   static defaultProps = {
     sentiment: "NONE",
+    decimals: 1,
   }
   render() {
-    const { label, unit, value, range, sentiment } = this.props
-    const less = range ? `-${range.min}` : " "
-    const more = range ? `+${range.max}` : " "
+    const { label, unit, value, range, sentiment, decimals } = this.props
+    const less = range ? `-${toFixed(range.min, decimals)}` : " "
+    const more = range ? `+${toFixed(range.max, decimals)}` : " "
     return (
       <Container sentiment={sentiment}>
         <Range>
           <Less>{less}</Less>
           <More>{more}</More>
         </Range>
-        <Value>{value}</Value>
+        <Value>{typeof value === "number" ? toFixed(value, decimals) : value}</Value>
         <Unit>{unit.toUpperCase()}</Unit>
         <Label>{label.toUpperCase()}</Label>
       </Container>

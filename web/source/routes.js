@@ -8,6 +8,7 @@ import Header from "./organisms/Header"
 import Footer from "./organisms/Footer"
 
 import Home from "./pages/Home"
+import SingleDate from "./pages/SingleDate"
 
 type Props = {}
 
@@ -20,6 +21,7 @@ export default class extends Component<Props> {
         <main>
           <Router>
             <Switch>
+              <Route path="/:year/:month/:day" component={SingleDate} />
               <Route path="/" component={Home} />
             </Switch>
           </Router>

@@ -9,7 +9,7 @@
     "unit": "node scripts/test.js --env=jsdom",
     "lint": "eslint .",
     "flow": "flow",
-    "predeploy": "npm run build",
+    "predeploy": "NODE_ENV=production npm run build",
     "deploy": "firebase deploy"
   },
   "dependencies": {

@@ -54,9 +54,9 @@ export const getPastDate = (daysAgo: number, startDate: Date = new Date()) => {
 }
 
 export const dateRange = (days: number, startDate: Date) =>
-  [...new Array(days + 1)].map(() => new Date(startDate.setDate(startDate.getDate() + 1)))
+  [...new Array(days)].map(() => new Date(startDate.setDate(startDate.getDate() + 1)))
 
-export const getDaysBetween = (startDate: Date, endDate: Date) => {
+export const getDaysBetween = (startDate: Date, endDate: Date): number => {
   const oneDayMs = 1000 * 60 * 60 * 24
   const startDateMs = startDate.getTime()
   const endDateMs = endDate.getTime()

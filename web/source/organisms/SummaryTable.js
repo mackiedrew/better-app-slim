@@ -1,6 +1,5 @@
 /* @flow */
 import React, { Component } from "react"
-import styled from "styled-components"
 import { compose } from "recompose"
 import { connect } from "react-redux"
 import { withFirebase, firestoreConnect } from "react-redux-firebase"
@@ -9,77 +8,71 @@ import moment from "moment"
 
 import type { FirebaseType } from "../types/FirebaseType"
 
-import PeriodicCell from "../molecules/PeriodicCell"
-import Row from "../templates/Row"
+import PeriodicTable from "../molecules/PeriodicTable"
 import Section from "../templates/Section"
-
-const StyledRow = styled(Row)`
-  flex-wrap: wrap;
-  justify-content: space-evenly
-  background-color: #dddddd;
-  margin-bottom: 0.5rem;
-`
 
 type Props = {
   firebase: FirebaseType,
   firestore: any,
   uid: string,
+  days: number,
 }
 
 type State = {
-  massLogs: Object[],
-  bodyFatLogs: Object[],
+  summaries: Object[],
 }
 
 class SummaryTable extends Component<Props, State> {
-  static defaultProps = {}
-  state = { massLogs: [], bodyFatLogs: [] }
+  static defaultProps = { days: 21 }
+  state = { summaries: [] }
+  getDailySummaries = async (firestore, uid, days) => {
+    const summariesSnapshot = await firestore
+      .collection("users")
+      .doc(uid)
+      .collection("summaries")
+      .orderBy("unixTimestamp", "desc")
+      .limit(days)
+      .get()
+    const summaries = await Promise.all(summariesSnapshot.docs.map(async doc => doc.data()))
+    return summaries
+  }
   async componentDidMount() {
-    const massLogs = await this.props.firestore
-      .collection("fitbit_users")
-      .doc(this.props.uid)
-      .collection("massLogs")
-      .orderBy("unixTimestamp", "desc")
-      .limit(21)
-      .get()
-    const bodyFatLogs = await this.props.firestore
-      .collection("fitbit_users")
-      .doc(this.props.uid)
-      .collection("bodyFatLogs")
-      .orderBy("unixTimestamp", "desc")
-      .limit(21)
-      .get()
-    const massLogData = await Promise.all(massLogs.docs.map(async doc => doc.data()))
-    const bodyFatLogsData = await Promise.all(bodyFatLogs.docs.map(async doc => doc.data()))
-    this.setState({ massLogs: massLogData, bodyFatLogs: bodyFatLogsData })
+    const { firestore, uid, days } = this.props
+    const summaries = await this.getDailySummaries(firestore, uid, days)
+    this.setState({ summaries })
   }
   render() {
-    const { massLogs } = this.state
+    const { summaries } = this.state
     return (
-      <Section title="Summary">
-        {massLogs.map(({ weight, logId, unixTimestamp }, index) => {
+      <Section title="Days">
+        {summaries.map(({ mass, bodyFat, unixTimestamp }, index) => {
           const date = moment(unixTimestamp)
-          const lastMassRecordIndex = Math.min(index + 1, massLogs.length - 1)
-          const lastMassRecord = massLogs[lastMassRecordIndex]
-          const lostMass = weight <= lastMassRecord.weight
-          const massSentiment = lostMass ? "GOOD" : "BAD"
+          const yesterdayIndex = Math.min(index + 1, this.props.days - 1)
           return (
-            <StyledRow key={`${logId}-${index}`}>
-              <PeriodicCell label="date" unit={date.format("MMM")} value={date.format("DD")} />
-              <PeriodicCell
-                sentiment={massSentiment}
-                range={{ min: 0.2, max: 0.5 }}
-                label="mass"
-                unit="kg"
-                value={weight}
-              />
-              <PeriodicCell
-                sentiment="MIXED"
-                label="bodyFat"
-                unit="%"
-                value={this.state.bodyFatLogs[index].fat}
-              />
-            </StyledRow>
+            <PeriodicTable
+              key={`${unixTimestamp}-${index}`}
+              cells={[
+                { label: "date", unit: date.format("MMM"), value: date.format("DD") },
+                {
+                  label: "mass",
+                  unit: "kg",
+                  range: { min: Math.abs(mass.min - mass.mean), max: mass.max - mass.mean },
+                  value: mass.mean,
+                  sentiment: mass.mean <= summaries[yesterdayIndex].mass.mean ? "GOOD" : "BAD",
+                },
+                {
+                  label: "bodyFat",
+                  unit: "%",
+                  range: {
+                    min: Math.abs(bodyFat.min - bodyFat.mean),
+                    max: bodyFat.max - bodyFat.mean,
+                  },
+                  value: bodyFat.mean,
+                  sentiment:
+                    bodyFat.mean <= summaries[yesterdayIndex].bodyFat.mean ? "GOOD" : "BAD",
+                },
+              ]}
+            />
           )
         })}
       </Section>
