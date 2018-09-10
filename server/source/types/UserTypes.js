@@ -22,6 +22,15 @@ export type Summary = {|
   height: number,
   age: number,
   gender: Gender,
+  goals: {
+    activityMinutes: number,
+    caloriesOut: number,
+    distance: number,
+    floors: number,
+    steps: number,
+  },
+  activities: Object[],
+  activitySummary: Object,
 |}
 
 export type User = {|

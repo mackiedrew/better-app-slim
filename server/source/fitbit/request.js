@@ -11,10 +11,8 @@ import {
   fitbitToRealDate,
   getPastDate,
   dateRange,
-  getMonthsBetween,
   getDaysBetween,
   lotsOfDate,
-  dateToFitbitTime,
 } from "../helpers/date"
 
 import { safeFirestoreInput } from "../firestore/helpers"
@@ -101,12 +99,12 @@ export const syncSleep = async (userId: string, options: EndpointOptions) => {
   const rawSleepLogs = ((await get(userId, endpoints.sleep, options)) || { sleep: [] }).sleep || {}
   const sleepLogs = rawSleepLogs instanceof Array ? rawSleepLogs : []
   sleepLogs.map(async log => {
-    const dateSet = lotsOfDate(options.date)
+    const dateSet = lotsOfDate(new Date(log.startTime))
     await fitbitUsersCollection
       .doc(userId)
       .collection("sleepLogs")
       .doc(`${log.logId}`)
-      .set(safeFirestoreInput({ ...log, startTime: new Date(log.startTime) }), { merge: true })
+      .set(safeFirestoreInput({ ...log, ...dateSet }), { merge: true })
   })
 }
 
@@ -116,7 +114,7 @@ export const syncActivitySummary = async (userId: string, options: EndpointDateO
   await fitbitUsersCollection
     .doc(userId)
     .collection("activitySummary")
-    .doc(options.date.toDateString())
+    .doc(`${dateSet.dateString}`)
     .set(safeFirestoreInput({ ...data, ...dateSet }), { merge: true })
 }
 
@@ -126,7 +124,7 @@ export const syncFoodLog = async (userId: string, options: EndpointDateOnly) => 
   await fitbitUsersCollection
     .doc(userId)
     .collection("foodLogs")
-    .doc(options.date.toDateString())
+    .doc(`${dateSet.dateString}`)
     .set(safeFirestoreInput({ ...data, ...dateSet }), { merge: true })
 }
 
@@ -203,14 +201,14 @@ export const getFitbitUser = async (uid: string) => {
 }
 
 export const fullSync = async (uid: string) => {
-  await syncProfile(uid)
+  // await syncProfile(uid)
   const { profile } = await getFitbitUser(uid)
   const earliestDataDate = new Date(...profile.memberSince.split("-").map(parseFloat))
   console.log(earliestDataDate)
   const today = new Date()
   // const monthsToSync = getMonthsBetween(earliestDataDate, today)
   const daysBetween = getDaysBetween(earliestDataDate, today)
-  const daysToSync = dateRange(daysBetween, earliestDataDate).slice(0, 800)
+  const daysToSync = dateRange(daysBetween, earliestDataDate).slice(0, 250)
   // await Promise.all(
   //   monthsToSync.map(async date => {
   //     // await syncMass(uid, { date, period: "1m" })
@@ -221,6 +219,7 @@ export const fullSync = async (uid: string) => {
     daysToSync.map(async date => {
       // await syncSleep(uid, { date })
       await syncFoodLog(uid, { date })
+      await syncActivitySummary(uid, { date })
       // Food Logs
     }),
   )

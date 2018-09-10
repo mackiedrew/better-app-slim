@@ -18,5 +18,3 @@ export const getUnixStartAndEndTimes = (date: Date): [number, number] => {
 
 export const fireStoreDateToDate = (fireStoreDate: { seconds: number } = { seconds: 0 }) =>
   new Date(fireStoreDate.seconds * 1000)
-
-export default fireStoreDateToDate

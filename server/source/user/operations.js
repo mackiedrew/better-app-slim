@@ -1,11 +1,11 @@
 /* @flow */
 
-import { lotsOfDate, dateRange, getDaysBetween } from "../helpers/date"
+import { lotsOfDate, dateRange, getDaysBetween, dateToFitbitDate } from "../helpers/date"
 import type { Summary } from "../types/UserTypes"
 import { fitbitUsersCollection, usersCollection } from "../firestore/collections"
 import { getFitbitUser } from "../fitbit/helpers"
 import { exploreValues } from "../helpers/math"
-import { queryForDate, resolveDocs } from "../firestore/helpers"
+import { queryForDate, resolveDocs, resolveDoc } from "../firestore/helpers"
 
 export const getUser = (uid: string) => usersCollection.doc(uid)
 
@@ -17,7 +17,8 @@ export const userSummariesCollection = (uid: string) => getUser(uid).collection(
 export const getUserSummary = (uid: string, dateTimeString: string) =>
   userSummariesCollection(uid).doc(dateTimeString)
 
-export const createDateSummary = async (uid: string, date: Date) => {
+export const createDateSummary = async (uid: string, rawDate: Date) => {
+  const date = new Date(rawDate.getFullYear(), rawDate.getMonth(), rawDate.getDate(), 0, 0, 0, 0)
   console.log(`Summarizing User: "${uid}" on Date: "${date.toDateString()}"`)
   const { dateString, timeString, dateTimeString, unixTimestamp } = lotsOfDate(date)
   // Create user summary document or fetch old one
@@ -32,14 +33,19 @@ export const createDateSummary = async (uid: string, date: Date) => {
   // Get Body Fat Logs
   const bodyFatCollection = fitbitUsersCollection.doc(uid).collection("bodyFatLogs")
   const bodyFatValues = await resolveDocs(queryForDate(bodyFatCollection, date))
-  // console.log(bodyFatValues)
   const bodyFat = exploreValues(bodyFatValues.map(({ fat }) => fat))
 
   // Get Mass Logs
   const massCollection = fitbitUsersCollection.doc(uid).collection("massLogs")
   const massValues = await resolveDocs(queryForDate(massCollection, date))
-  // console.log(massValues)
   const mass = exploreValues(massValues.map(({ weight }) => weight))
+
+  // Get Activity Logs
+  const activitySummaryCollection = fitbitUsersCollection.doc(uid).collection("activitySummary")
+  const activitySummaryOfDate = await resolveDocs(
+    activitySummaryCollection.where("dateString", "==", dateToFitbitDate(date)),
+  )
+  const [{ goals, activities, summary: activitySummary }] = activitySummaryOfDate
 
   // Construct final summary
   const summary: Summary = {
@@ -53,6 +59,9 @@ export const createDateSummary = async (uid: string, date: Date) => {
     bodyFat,
     mass,
     gender,
+    goals,
+    activities,
+    activitySummary,
   }
   await userSummary.set(summary)
   return summary

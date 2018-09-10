@@ -1,10 +1,10 @@
 /* @flow */
 import React, { Component } from "react"
-import { compose } from "recompose"
-import { connect } from "react-redux"
 
-import SummaryTable from "../organisms/SummaryTable"
-import LoginForm from "../organisms/LoginForm"
+import withLoggedIn from "../containers/withLoggedIn"
+
+import MassChart from "../organisms/MassChart"
+import DailyStats from "../organisms/DailyStats"
 import FitbitActions from "../organisms/FitbitActions"
 
 type Props = {
@@ -16,17 +16,12 @@ class LoginPage extends Component<Props> {
   render() {
     return (
       <div>
-        {!this.props.loggedIn ? <LoginForm /> : null}
-        {this.props.loggedIn ? <FitbitActions /> : null}
-        {this.props.loggedIn ? <SummaryTable /> : null}
+        <MassChart />
+        <FitbitActions />
+        <DailyStats days={20} />
       </div>
     )
   }
 }
 
-export default compose(
-  connect(state => ({
-    loggedIn: Boolean(!state.firebase.auth.isEmpty),
-    uid: state.firebase.auth.uid,
-  })),
-)(LoginPage)
+export default withLoggedIn(LoginPage)

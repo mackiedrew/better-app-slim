@@ -225,12 +225,14 @@ export type Activity = {
 export type DailyActivityResponse = {
   activities: Activity[],
   goals: {
+    activityMinutes: number,
     caloriesOut: number,
     distance: number,
     floors: number,
     steps: number,
   },
   summary: {
+    activityScore: number,
     activityCalories: number,
     caloriesBMR: number,
     caloriesOut: number,
@@ -238,6 +240,13 @@ export type DailyActivityResponse = {
     elevation: number,
     fairlyActiveMinutes: number,
     floors: number,
+    heartRateZones: {
+      caloriesOut: number,
+      max: number,
+      min: number,
+      minutes: number,
+      name: string,
+    }[],
     lightlyActiveMinutes: number,
     marginalCalories: number,
     sedentaryMinutes: number,
