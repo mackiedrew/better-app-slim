@@ -11,6 +11,7 @@ import type { FirebaseType } from "../types/FirebaseType"
 
 import { reverse } from "../helpers/collection"
 import { mRound } from "../helpers/round"
+import Section from "../templates/Section"
 import { getDailySummaries } from "../helpers/dailySummary"
 import theme from "../theme"
 
@@ -33,7 +34,7 @@ type State = {
 
 /* eslint-disable id-length */
 class MassChart extends Component<Props, State> {
-  static defaultProps = { days: 7, latestDate: new Date() }
+  static defaultProps = { days: 60, latestDate: new Date() }
   state = { data: [] }
 
   async componentDidMount() {
@@ -53,18 +54,20 @@ class MassChart extends Component<Props, State> {
   }
   render() {
     return (
-      <LineChart width={600} height={300} data={this.state.data}>
-        <XAxis dataKey="date" />
-        <YAxis
-          type="number"
-          domain={[dataMin => mRound(dataMin - 5, 5), dataMax => mRound(dataMax + 5, 5)]}
-        />
-        <CartesianGrid strokeDasharray="5 5" />
-        <Line type="monotone" dataKey="min" stroke={theme.color.blue} />
-        <Line type="monotone" dataKey="mean" stroke={theme.color.green} />
-        <Line type="monotone" dataKey="max" stroke={theme.color.red} />
-        <Tooltip formatter={value => value.toFixed(1)} />
-      </LineChart>
+      <Section title="Mass">
+        <LineChart width={600} height={300} data={this.state.data}>
+          <XAxis dataKey="date" />
+          <YAxis
+            type="number"
+            domain={[dataMin => mRound(dataMin - 5, 5), dataMax => mRound(dataMax + 5, 5)]}
+          />
+          <CartesianGrid strokeDasharray="5 5" />
+          <Line type="monotone" dataKey="min" stroke={theme.color.blue} />
+          <Line type="monotone" dataKey="mean" stroke={theme.color.green} />
+          <Line type="monotone" dataKey="max" stroke={theme.color.red} />
+          <Tooltip formatter={value => value.toFixed(1)} />
+        </LineChart>
+      </Section>
     )
   }
 }

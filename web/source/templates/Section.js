@@ -11,6 +11,7 @@ const StyledSection = styled.section`
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
+  width: 100%;
   padding: 1rem;
   border-bottom: 1px solid #dddddd;
 `

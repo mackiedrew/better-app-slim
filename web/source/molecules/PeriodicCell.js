@@ -19,7 +19,7 @@ const Container = styled.div`
         return theme.color.yellow
       case "NONE":
       default:
-        return "white"
+        return theme.color.lightGrey
     }
   }};
   color: ${({ theme }) => theme.color.nearlyBlack};

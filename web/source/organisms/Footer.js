@@ -2,6 +2,10 @@
 import React, { Component } from "react"
 import styled from "styled-components"
 
+const FooterText = styled.small`
+  font-weight: 100;
+`
+
 const StyledFooter = styled.footer`
   display: flex;
   justify-content: center;
@@ -15,7 +19,7 @@ class Footer extends Component<Props> {
   render() {
     return (
       <StyledFooter>
-        <small>All Rights Reserved, Mackie Drew, 2018</small>
+        <FooterText>Mackie Drew © 2018</FooterText>
       </StyledFooter>
     )
   }

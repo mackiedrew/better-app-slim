@@ -9,9 +9,8 @@ import Row from "../templates/Row"
 
 const Table = styled(Row)`
   flex-wrap: wrap;
-  justify-content: space-evenly;
-  background-color: #dddddd;
-  margin-bottom: 0.5rem;
+  justify-content: flex-start;
+  margin-bottom: 1rem;
 `
 
 type Props = {

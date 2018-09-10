@@ -1,10 +1,12 @@
 /* @flow */
 import React, { Component, Fragment } from "react"
+import { compose } from "recompose"
 import styled from "styled-components"
+
+import moment from "moment"
 
 import withLoggedIn from "../containers/withLoggedIn"
 
-import Button from "../atoms/Button"
 import Title from "../atoms/Title"
 import Row from "../templates/Row"
 import Section from "../templates/Section"
@@ -23,7 +25,9 @@ const CenteredRow = styled(Row)`
 
 type Props = {
   uid: string | null,
+  date: Date,
   loggedIn: boolean,
+  push: string => void,
   match: {
     params: {|
       month: string,
@@ -41,14 +45,22 @@ class SingleDate extends Component<Props> {
     return providedDate
   }
   render() {
-    const date = this.getDate()
+    const date = this.props.date ? this.props.date : this.getDate()
     if (typeof date === "boolean") return null
+    const momentDate = moment(
+      new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0),
+    )
+    const momentToday = moment(new Date())
+    const nextDay = moment(momentDate).add(1, "days")
+    const lastDay = moment(momentDate).subtract(1, "days")
     return (
       <Fragment>
         <CenteredRow>
-          <Button>Previous</Button>
-          <PageTitle as="h1">{date.toDateString()}</PageTitle>
-          <Button>Next</Button>
+          <a href={lastDay.format("/YYYY/MM/DD")}>{"<<"}</a>
+          <PageTitle>{date.toDateString()}</PageTitle>
+          {momentToday.format("YYYY-MM-DD") !== momentDate.format("YYYY-MM-DD") ? (
+            <a href={nextDay.format("/YYYY/MM/DD")}>{">>"}</a>
+          ) : null}
         </CenteredRow>
         <Section title={"Summary"}>
           <DailyStats days={1} latestDate={date} />
@@ -58,4 +70,4 @@ class SingleDate extends Component<Props> {
   }
 }
 
-export default withLoggedIn(SingleDate)
+export default compose(withLoggedIn({ showLogin: true }))(SingleDate)
