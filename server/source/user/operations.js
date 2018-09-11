@@ -5,7 +5,8 @@ import type { Summary } from "../types/UserTypes"
 import { fitbitUsersCollection, usersCollection } from "../firestore/collections"
 import { getFitbitUser } from "../fitbit/helpers"
 import { exploreValues } from "../helpers/math"
-import { queryForDate, resolveDocs, resolveDoc } from "../firestore/helpers"
+import { getIdealMasses } from "../helpers/health/mass"
+import { queryForDate, resolveDocs } from "../firestore/helpers"
 
 export const getUser = (uid: string) => usersCollection.doc(uid)
 
@@ -16,6 +17,12 @@ export const userSummariesCollection = (uid: string) => getUser(uid).collection(
 
 export const getUserSummary = (uid: string, dateTimeString: string) =>
   userSummariesCollection(uid).doc(dateTimeString)
+
+export const setIdealMasses = async (uid: string, height: number) => {
+  const user = getUser(uid)
+  const idealMasses = getIdealMasses(height)
+  await user.set({ idealMasses, height }, { merge: true })
+}
 
 export const createDateSummary = async (uid: string, rawDate: Date) => {
   const date = new Date(rawDate.getFullYear(), rawDate.getMonth(), rawDate.getDate(), 0, 0, 0, 0)
@@ -47,6 +54,14 @@ export const createDateSummary = async (uid: string, rawDate: Date) => {
   )
   const [{ goals, activities, summary: activitySummary }] = activitySummaryOfDate
 
+  // Get Nutrition Logs
+  const foodLogsCollection = fitbitUsersCollection.doc(uid).collection("foodLogs")
+  const foodLogs = await await resolveDocs(
+    foodLogsCollection.where("dateString", "==", dateToFitbitDate(date)),
+  )
+  const [{ foods, summary: nutrition } = {}] = foodLogs || [{}]
+  console.log(foodLogs)
+
   // Construct final summary
   const summary: Summary = {
     date,
@@ -60,10 +75,13 @@ export const createDateSummary = async (uid: string, rawDate: Date) => {
     mass,
     gender,
     goals,
+    foods: foods || [],
+    nutrition: nutrition || {},
     activities,
     activitySummary,
   }
   await userSummary.set(summary)
+  await setIdealMasses(uid, height)
   return summary
 }
 

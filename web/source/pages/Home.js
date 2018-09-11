@@ -5,7 +5,6 @@ import withLoggedIn from "../containers/withLoggedIn"
 
 import MassChart from "../organisms/MassChart"
 import DailyStats from "../organisms/DailyStats"
-import FitbitActions from "../organisms/FitbitActions"
 import Section from "../templates/Section"
 
 type Props = {
@@ -21,7 +20,6 @@ class LoginPage extends Component<Props> {
         <Section title="Month">
           <DailyStats days={30} />
         </Section>
-        <FitbitActions />
       </Fragment>
     )
   }

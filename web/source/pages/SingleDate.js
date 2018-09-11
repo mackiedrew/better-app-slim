@@ -7,10 +7,12 @@ import moment from "moment"
 
 import withLoggedIn from "../containers/withLoggedIn"
 
+import Card from "../templates/Card"
 import Title from "../atoms/Title"
 import Row from "../templates/Row"
 import Section from "../templates/Section"
 import DailyStats from "../organisms/DailyStats"
+import MacroRadar from "../organisms/MacroRadar"
 
 const PageTitle = styled(Title)`
   margin: 0;
@@ -55,6 +57,10 @@ class SingleDate extends Component<Props> {
     const lastDay = moment(momentDate).subtract(1, "days")
     return (
       <Fragment>
+        <Card>
+          <Title>LOL</Title>
+        </Card>
+        <MacroRadar />
         <CenteredRow>
           <a href={lastDay.format("/YYYY/MM/DD")}>{"<<"}</a>
           <PageTitle>{date.toDateString()}</PageTitle>

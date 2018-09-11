@@ -1,6 +1,16 @@
 /* @flow */
 import type { Gender } from "./HealthTypes"
 
+export type Nutrition = {|
+  calories: number,
+  carbs: number,
+  fat: number,
+  fiber: number,
+  protein: number,
+  sodium: number,
+  water: number,
+|}
+
 export type Summary = {|
   date: Date,
   dateString: string, // "YYYY-MM-DD"
@@ -29,6 +39,25 @@ export type Summary = {|
     floors: number,
     steps: number,
   },
+  foods: {
+    isFavorite: boolean,
+    logDate: string,
+    logId: number,
+    loggedFood: {
+      accessLevel: "PUBLIC" | "PRIVATE" | "SHARED",
+      amount: number,
+      brand: string,
+      calories: number,
+      foodId: number,
+      mealTypeId: number,
+      locale: string,
+      name: string,
+      unit: { id: number, name: string, plural: string },
+      units: number[],
+    },
+    nutritionalValues: Nutrition,
+  }[],
+  nutrition: Nutrition,
   activities: Object[],
   activitySummary: Object,
 |}

@@ -8,5 +8,6 @@ export default {
     blue: "rgba(82, 179, 217, 1)",
     main: "rgba(154, 18, 179, 1)",
     mainLight: "rgba(191, 85, 236, 1)",
+    mainLighter: "#c566ee",
   },
 }

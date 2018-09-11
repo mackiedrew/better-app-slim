@@ -10,6 +10,7 @@ import Footer from "./organisms/Footer"
 
 import Home from "./pages/Home"
 import SingleDate from "./pages/SingleDate"
+import Profile from "./pages/Profile"
 
 const StyledColumn = styled(Column)`
   align-items: stretch;
@@ -36,6 +37,7 @@ export default class extends Component<Props> {
         <Main>
           <Router>
             <Switch>
+              <Route path="/profile" component={Profile} />
               <Route
                 path="/today"
                 component={props => <SingleDate {...props} date={new Date()} />}

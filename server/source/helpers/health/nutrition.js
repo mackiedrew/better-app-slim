@@ -1,21 +1,13 @@
 /* @flow */
 
-import type {
-  Kilograms,
-  Centimeters,
-  Years,
-  Gender,
-  Kcal,
-  PhysicalActivityLevel,
-  ActivityRegion,
-} from "../../types/HealthTypes"
+import type { Kilograms, Kcal, Percentage } from "../../types/HealthTypes"
 
 import { getFatMass } from "./composition"
 
-export const getMaxDeficit = (mass: Kilograms, bodyFat: Percentage) => {
-  const kcalFrom1kgOfFat = 69
+export const getMaxDeficit = (mass: Kilograms, bodyFat: Percentage): Kcal => {
+  const kcalFrom1kgOfFat = 69 // kcal / kg
   const fatMass = getFatMass(mass, bodyFat)
-  return fatMass
+  return fatMass * kcalFrom1kgOfFat
 }
 
-// export const getMinEnergy = (tdee, )
+export default getMaxDeficit

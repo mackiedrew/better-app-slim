@@ -48,7 +48,9 @@ class LoginForm extends Component<Props, State> {
     const { firebase } = this.props
     return (
       <Row>
-        <ProfilePicture src={this.state.profilePicture} />
+        <a href="/profile">
+          <ProfilePicture src={this.state.profilePicture} />
+        </a>
         <Button onClick={firebase.logout}>Logout</Button>
       </Row>
     )

@@ -13,6 +13,7 @@ import {
   dateRange,
   getDaysBetween,
   lotsOfDate,
+  getMonthsBetween,
 } from "../helpers/date"
 
 import { safeFirestoreInput } from "../firestore/helpers"
@@ -142,6 +143,7 @@ export const syncDayOneUser = async (userId: string, date: Date = new Date()) =>
   await syncBodyFat(userId, { date })
   await syncSleep(userId, { date })
   await syncActivitySummary(userId, { date })
+  await syncFoodLog(userId, { date })
   await createDateSummary(userId, date)
   return true
 }
@@ -158,6 +160,7 @@ export const syncWeekOneUser = async (userId: string) => {
       await syncBodyFat(userId, { date })
       await syncSleep(userId, { date })
       await syncActivitySummary(userId, { date })
+      await syncFoodLog(userId, { date })
       await createDateSummary(userId, date)
     }),
   )
@@ -201,26 +204,25 @@ export const getFitbitUser = async (uid: string) => {
 }
 
 export const fullSync = async (uid: string) => {
-  // await syncProfile(uid)
+  await syncProfile(uid)
   const { profile } = await getFitbitUser(uid)
   const earliestDataDate = new Date(...profile.memberSince.split("-").map(parseFloat))
   console.log(earliestDataDate)
   const today = new Date()
-  // const monthsToSync = getMonthsBetween(earliestDataDate, today)
+  const monthsToSync = getMonthsBetween(earliestDataDate, today)
   const daysBetween = getDaysBetween(earliestDataDate, today)
-  const daysToSync = dateRange(daysBetween, earliestDataDate).slice(0, 250)
-  // await Promise.all(
-  //   monthsToSync.map(async date => {
-  //     // await syncMass(uid, { date, period: "1m" })
-  //     // await syncBodyFat(uid, { date, period: "1m" })
-  //   }),
-  // )
+  const daysToSync = dateRange(daysBetween, earliestDataDate).slice(400, 1000)
+  await Promise.all(
+    monthsToSync.map(async date => {
+      // await syncMass(uid, { date, period: "1m" })
+      // await syncBodyFat(uid, { date, period: "1m" })
+    }),
+  )
   await Promise.all(
     daysToSync.map(async date => {
-      // await syncSleep(uid, { date })
-      await syncFoodLog(uid, { date })
-      await syncActivitySummary(uid, { date })
-      // Food Logs
+      await syncSleep(uid, { date })
+      // await syncFoodLog(uid, { date })
+      // await syncActivitySummary(uid, { date })
     }),
   )
 }

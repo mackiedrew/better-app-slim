@@ -1,6 +1,6 @@
 /* @flow */
 import React, { Component } from "react"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts"
 import { compose } from "recompose"
 import { connect } from "react-redux"
 import { withFirebase, firestoreConnect } from "react-redux-firebase"
@@ -10,10 +10,8 @@ import moment from "moment"
 import type { FirebaseType } from "../types/FirebaseType"
 
 import { reverse } from "../helpers/collection"
-import { mRound } from "../helpers/round"
 import Section from "../templates/Section"
 import { getDailySummaries } from "../helpers/dailySummary"
-import theme from "../theme"
 
 type Props = {
   firebase: FirebaseType,
@@ -25,17 +23,22 @@ type Props = {
 
 type State = {
   data: {
-    date: string,
-    min: number,
-    max: number,
-    mean: number,
+    macro: string,
+    value: number,
+    fullMark: number,
   }[],
 }
 
 /* eslint-disable id-length */
-class MassChart extends Component<Props, State> {
+class MacroRadar extends Component<Props, State> {
   static defaultProps = { days: 60, latestDate: new Date() }
-  state = { data: [] }
+  state = {
+    data: [
+      { macro: "Protein", value: 120, fullMark: 10 },
+      { macro: "Fat", value: 98, fullMark: 150 },
+      { macro: "Carbohydrates", value: 86, fullMark: 42 },
+    ],
+  }
 
   async componentDidMount() {
     const { firestore, uid, days, latestDate } = this.props
@@ -50,23 +53,18 @@ class MassChart extends Component<Props, State> {
         }))
         .filter(({ min, max, mean }) => min && max && mean),
     )
-    this.setState({ data })
+    console.log(data)
+    // this.setState({ data })
   }
   render() {
     return (
-      <Section title="Mass">
-        <LineChart width={600} height={300} data={this.state.data}>
-          <XAxis dataKey="date" />
-          <YAxis
-            type="number"
-            domain={[dataMin => mRound(dataMin - 5, 5), dataMax => mRound(dataMax + 5, 5)]}
-          />
-          <CartesianGrid strokeDasharray="5 5" />
-          <Line type="monotone" dataKey="min" stroke={theme.color.blue} dot={false} />
-          <Line type="monotone" dataKey="max" stroke={theme.color.red} dot={false} />
-          <Line type="monotone" dataKey="mean" stroke={theme.color.green} />
-          <Tooltip formatter={value => value.toFixed(1)} />
-        </LineChart>
+      <Section title="Macros">
+        <RadarChart outerRadius={90} width={730} height={250} data={this.state.data}>
+          <PolarGrid />
+          <PolarAngleAxis dataKey="macro" />
+          <PolarRadiusAxis angle={30} domain={[0, 250]} />
+          <Radar dataKey="value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+        </RadarChart>
       </Section>
     )
   }
@@ -77,4 +75,4 @@ export default compose(
   withFirebase,
   firestoreConnect(),
   connect(state => ({ uid: state.firebase.auth.uid })),
-)(MassChart)
+)(MacroRadar)
