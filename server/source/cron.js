@@ -2,15 +2,13 @@
 
 import cron from "node-cron"
 
-import { syncWeekWithoutResponse, fullSync } from "./fitbit/request"
+import { syncWeekWithoutResponse } from "./fitbit/request"
+// import { syncWeekWithoutResponse, fullSync } from "./fitbit/request"
+// import { summarizeDateRange } from "./user/operations"
 
-import { summarizeDateRange } from "./user/operations"
+const everyHourOn5Min = "5 */1 * * *"
+cron.schedule(everyHourOn5Min, syncWeekWithoutResponse)
 
-const onceEveryDayAt1AM = "0 1 * * *"
-
-cron.schedule(onceEveryDayAt1AM, syncWeekWithoutResponse)
-
-summarizeDateRange("r4XJfHyPlmSRs9mWbomikPikKLI2", new Date(2018, 7, 8), new Date(2018, 8, 10))
-
-// fullSync("r4XJfHyPlmSRs9mWbomikPikKLI2")
+// summarizeDateRange("r4XJfHyPlmSRs9mWbomikPikKLI2", new Date(2018, 7, 8), new Date(2018, 8, 10))
 // syncWeekWithoutResponse()
+// fullSync("r4XJfHyPlmSRs9mWbomikPikKLI2")

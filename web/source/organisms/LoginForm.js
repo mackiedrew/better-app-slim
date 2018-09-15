@@ -3,54 +3,36 @@ import React, { Component } from "react"
 import { compose } from "recompose"
 import { withFirebase } from "react-redux-firebase"
 
-import type { FirebaseType } from "../types/FirebaseType"
+import { reduxForm } from "redux-form"
 
-import Row from "../templates/Row"
-import Column from "../templates/Column"
-import TextInput from "../molecules/TextInput"
-import Button from "../atoms/Button"
-import ErrorMessage from "../atoms/ErrorMessage"
+import type { FirebaseType } from "../types/FirebaseType"
+import Input from "../molecules/form/Input"
+import Form from "../molecules/Form"
+import SubmitButton from "../molecules/form/SubmitButton"
 
 type Props = {
   firebase: FirebaseType,
-  isRegister?: boolean,
+  handleSubmit: Function,
 }
 
-type State = {
-  email: string,
-  password: string,
-  error: string | null,
-}
-
-class LoginForm extends Component<Props, State> {
-  state = { email: "", password: "", error: null }
-  handleValueChange = (key: string) => (event: SyntheticInputEvent<HTMLInputElement>) =>
-    this.setState({ [key]: event.target.value })
-  handleEmailChange = this.handleValueChange("email")
-  handlePasswordChange = this.handleValueChange("password")
-  accountAction = action => () =>
-    this.props.firebase[action]({
-      email: this.state.email,
-      password: this.state.password,
-    }).catch(error => {
-      this.setState({ error: error.message })
+class LoginForm extends Component<Props> {
+  handleLogin = values =>
+    this.props.firebase.login({
+      email: values.email,
+      password: values.password,
     })
-  handleLogin = this.accountAction("login")
-  handleRegister = this.accountAction("createUser")
   render() {
-    const { error, password, email } = this.state
     return (
-      <Column>
-        <TextInput label="Email" value={email} onChange={this.handleEmailChange} />
-        <TextInput hidden label="Password" value={password} onChange={this.handlePasswordChange} />
-        <Row>
-          <Button onClick={this.handleLogin}>Login</Button>
-          <Button onClick={this.handleRegister}>Register</Button>
-        </Row>
-        <ErrorMessage>{error ? error : ""}</ErrorMessage>
-      </Column>
+      <Form title="Login" onSubmit={this.props.handleSubmit}>
+        <Input label="Email" name="email" component="input" type="email" />
+        <Input label="Password" name="password" component="input" type="password" />
+        <SubmitButton>Login</SubmitButton>
+      </Form>
     )
   }
 }
 
-export default compose(withFirebase)(LoginForm)
+export default compose(
+  withFirebase,
+  reduxForm({ form: "login" }),
+)(LoginForm)
