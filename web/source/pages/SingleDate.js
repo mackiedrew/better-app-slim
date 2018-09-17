@@ -12,7 +12,6 @@ import Title from "../atoms/Title"
 import Row from "../templates/Row"
 import Section from "../templates/Section"
 import DailyStats from "../organisms/DailyStats"
-import MacroRadar from "../organisms/MacroRadar"
 
 const PageTitle = styled(Title)`
   margin: 0;
@@ -57,10 +56,6 @@ class SingleDate extends Component<Props> {
     const lastDay = moment(momentDate).subtract(1, "days")
     return (
       <Fragment>
-        <Card>
-          <Title>LOL</Title>
-        </Card>
-        <MacroRadar />
         <CenteredRow>
           <a href={lastDay.format("/YYYY/MM/DD")}>{"<<"}</a>
           <PageTitle>{date.toDateString()}</PageTitle>
@@ -68,6 +63,9 @@ class SingleDate extends Component<Props> {
             <a href={nextDay.format("/YYYY/MM/DD")}>{">>"}</a>
           ) : null}
         </CenteredRow>
+        <Card>
+          <Title>LOL</Title>
+        </Card>
         <Section title={"Summary"}>
           <DailyStats days={1} latestDate={date} />
         </Section>

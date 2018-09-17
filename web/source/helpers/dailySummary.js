@@ -112,5 +112,9 @@ export const summaryToTable = (summary: Object, previousSummary: Object) => {
   return cells
 }
 
-export const summariesToTable = (summaries: Object[]) =>
-  summaries.slice(0, -1).map((summary, index) => summaryToTable(summary, summaries[index + 1]))
+export const summariesToTable = (summaries: Array<Object>): Array<Array<Object>> => {
+  if (summaries.length < 2) return []
+  return summaries
+    .slice(0, -1)
+    .map((summary: Object, index: number) => summaryToTable(summary, summaries[index + 1]))
+}
