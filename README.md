@@ -1,20 +1,7 @@
-# Better App Slim
+# Better App
 
-- User account creation
-- Authenticate with Fitbit
-- Originally sync all available data from fitbit
-- Periodically store data from fitbit in Firestore
+## Sub-projects
 
-# Acute todo list
-- Use refresh token
-- Setup cron job
-- Create BASIC frontend usability
-- Deal with rate limiting
-- Create onboarding step
-
-
-SYNC BEGINNING OF TIME FITBIT
-STORE DATESTRING
-STORE TIMESTRING
-STORE DATETIMESTRING
-
+1. [Server](./server/)
+1. [Web](./web/)
+1. [Native](./native/)
