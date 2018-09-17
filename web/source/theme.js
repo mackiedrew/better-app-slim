@@ -1,3 +1,11 @@
+/* @flow */
+
+/*
+ * Theme rules:
+ * 1. Always use rgba() format colors
+ * 
+ */
+
 export default {
   color: {
     nearlyBlack: "#333333",
@@ -8,6 +16,6 @@ export default {
     blue: "rgba(82, 179, 217, 1)",
     main: "rgba(154, 18, 179, 1)",
     mainLight: "rgba(191, 85, 236, 1)",
-    mainLighter: "#c566ee",
+    mainLighter: "rgba(197, 102, 238, 1)",
   },
 }
